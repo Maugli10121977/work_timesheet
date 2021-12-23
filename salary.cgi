@@ -30,11 +30,7 @@ print('''<!DOCTYPE html>
 print(f'<p><i><b>{today}</b></i></p>')
 
 print('''<form method="post">
-<<<<<<< HEAD
       <fieldset><legend>Ввод данных о зарплате</legend>
-=======
-      <fieldset><legend>Ввод данных о зарплате и штрафах</legend>
->>>>>>> 5b752fc059d6cda01b16b0257d7104399ea0ff39
       <input type="text" name="payday" placeholder="Дата"><br>
       <input type="text" name="boss" placeholder="Босс"><br>
       <input type="text" name="amount_money" placeholder="Зарплата"><br><br>
