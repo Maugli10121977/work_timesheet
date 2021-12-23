@@ -62,7 +62,7 @@ print('<p><a href="salary.cgi">Запись данных о З/П</a></p><br>')
 if f'salary_{y}.db' not in os.listdir():
     sdb_connect = sqlite3.connect(f'salary_{y}.db')
     sdb = sdb_connect.cursor()
-    sdb.execute('CREATE TABLE salary (c_d, c_t, payday, boss, amount_money);')
+    sdb.execute('CREATE TABLE salary (c_d, c_t, payday, boss, amount_money, note);')
     sdb_connect.commit()
     sdb.close(); del sdb
     sdb_connect.close(); del sdb_connect
@@ -246,7 +246,7 @@ def read_salary_db():
     global salary_db
     sdb_connect = sqlite3.connect(f'salary_{y}.db')
     sdb = sdb_connect.cursor()
-    salary_db = sdb.execute('SELECT payday, boss, amount_money FROM salary;').fetchall()
+    salary_db = sdb.execute('SELECT payday, boss, amount_money, note FROM salary;').fetchall()
     sdb.close(); del sdb
     sdb_connect.close(); del sdb_connect
     return salary_db
@@ -269,7 +269,7 @@ print(f'<p>ПОЛУЧЕНО:</p>')
 remainder = sum_year_rub + sum_year_added_rub + sum_year_bonus - sum_year_fine
 for i in salary_db:
     if i[1] != 'None':
-        print(f'<p>{i[0]} <b>З/П {i[2]}</b> от <i>{i[1]}</i>')
+        print(f'<p>{i[0]} <b>{i[2]}</b> ({i[3]}) от <i>{i[1]}</i>')
         remainder = remainder - int(i[2])
 print('<p>-----------------------------</p>')
 print(f'<p>ОСТАТОК:   <i><b>{remainder}</b></i></p>')
