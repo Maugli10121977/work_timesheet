@@ -38,7 +38,7 @@ print('''<form method="post">
 <input type="text" name="worked_date" placeholder="Дата   ">
 <input type="text" name="boss" placeholder="Босс   "><br>
 <input type="text" name="address" placeholder="Основной адрес   ">
-<input type="text" name="added_address" placeholder="Дополнительный адрес   "><br>
+<input type="text" name="added_address" placeholder="Дополнительный адрес   "> <input type="checkbox" name="change_location"><br>
 <input type="text" name="hours" placeholder="Основные часы   ">
 <input type="text" name="added_hours" placeholder="Дополнительные часы   "><br>
 <input type="text" name="bonus" placeholder="Бонус   ">
@@ -103,7 +103,7 @@ if not fine:
     fine = 0
 
 hlc = 0 #hour_per_location_change, час за смену локации
-if address != "Нет" and added_address != "Нет" and bonus == 0:
+if bool(work.getfirst('change_location')) == True:
     hlc += 1
 
 def read_timesheet_table():
