@@ -303,7 +303,7 @@ window.onload = function()
     var re_str = /<p>(<i><b>(?<date>[0-9]{2}\/[0-9]{2}\/[0-9]{4})<\/b><\/i>)(?<unnecessary_1>.*\\n.*\\n\s*)(<i>Адрес:\s*<br>\\n\s*<b>(?<address>.*)<\/b><\/i><br>\\n\s*)(<i>Осн. часы:\\n*.*<b>(?<hours>[0-9]{1,2}\.[0-9]{1,2})<\/b>)(?<unnecessary_2>\s\([0-9]*\.\d{1,2}\).*\\n\s*)(<i>Доп. адрес:\s*.*\\n\s*<b>(?<added_address>.*)<\/b>.*\\n\s*)(<i>Доп. часы:\s*.*<b>(?<added_hours>[0-9]{1,2}\.[0-9]{1,2})<\/b>\s\(\d*\.\d{1,2}\s\+\s(?<change_location>[0-9]*\.[0-9]{1,2})\s.*\\n\s*)(<i>Бонус:\s*(?<bonus>[0-9]*)<\/i>.*\\n\s*)(<i>Штраф:\s*(?<fine>[0-9]*).*\\n\s*)(<i>Итог дня:\s*(?<money_one_day>[0-9]*\.[0-9]{1,2})<\/i>)<\/p>/
     var regexp = new RegExp(re_str, "mu"); 
     var groups_regexp; 
-    for(var i=1; i<marked.length; ++i) 
+    for(var i=0; i<marked.length; ++i) 
       {/*for*/
       if (marked[i].checked) 
         {/*if*/
