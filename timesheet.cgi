@@ -16,7 +16,8 @@ today = datetime.now().strftime("%d/%m/%Y %H:%M")
 year = []
 for i in range(1,13):
     year.append(calendar.monthcalendar(int(y), i)) # запись в 'year' всех дат года
-tariff = 250.0 # тариф в час
+tariff_one_day = 2500 # тариф в день
+tariff = tariff_one_day / 8 # тариф в час
 
 print('Content-type: text/html')
 print('')
@@ -58,7 +59,7 @@ print('''<form method="post">
 </fieldset>
 </form>''')
 
-print('<p><a href="salary.cgi">Запись данных о З/П</a></p><br>')
+print('<p><a href="salary.cgi">Запись данных о З/П</a></p>')
 
 if f'timesheet_{y}.db' not in os.listdir():
     db_connect = sqlite3.connect(f'timesheet_{y}.db')
@@ -141,8 +142,9 @@ sum_year_holidays = 0 # сумма выходных дней за год
 result_year_rub = 0 # результат (в рублях) за год
 
 print('<hr size="2">')
+print('<input style="position:fixed;" type="submit" id="get_marked_days" value="Показать помеченные дни"><br><br>')
 
-print('<details><summary><i><b>Показать календарь</b></i></summary>') # Показать календарь
+print('<details><p><summary><i><b>Показать календарь</b></i></summary></p>') # Показать календарь
 print('<table border="1" width="100%">')
 month = (m for m in year)
 for a in range(1, len(year)+1):
@@ -170,12 +172,12 @@ for a in range(1, len(year)+1):
         week_next = week.__next__()
         for c in range(len(week_next)):
             if week_next[c] != 0:
-                print('<td>')
+                print('<td name="marked_days">')
                 if week_next[c] < 10: date_d = '0' + str(week_next[c])
                 else: date_d = str(week_next[c])
                 if a < 10: date_m = '0' + str(a)
                 else: date_m = str(a)
-                print(f'<p><i><b>{date_d}/{date_m}/{y}</b></i></p>')
+                print(f'<p><i><b>{date_d}/{date_m}/{y}</b></i> <input align="right" type="checkbox" name="marked" id="mark_{date_d}_{date_m}_{y}"></p>')
                 # сюда данные из БД
                 for z in timesheet_table_dict.keys():
                     if f'{y}-{date_m}-{date_d}' == z:
@@ -264,6 +266,8 @@ for i in salary_table:
     if i[2] != 'None':
         sum_amount_money = sum_amount_money + int(i[2])
 
+#print('<input style="position:fixed; background-color:silver;" type="submit" id="get_marked_days" value="Показать помеченные дни">')
+
 print('<hr size="2">')
 print(f'<details><summary><i><b>ИТОГО (за весь {y} год):</b></i></summary>') # ИТОГИ ГОДА
 print('<p>-----------------------------')
@@ -285,4 +289,37 @@ print(f'<p>Выходных дней:   {sum_year_holidays}</p>')
 print('</details><br>') # ИТОГИ ГОДА
 print('<hr size="2">')
 db_connect.close(); del db_connect
+
+print('''<script>
+window.onload = function()
+{/*func_1*/
+  get_marked_days.onclick = function()
+  {/*func_2*/
+    var all_money = Number(); 
+    var result; 
+    var marked = document.getElementsByName("marked"); 
+    var marked_days = document.getElementsByName("marked_days"); 
+    /* 're_str' НЕ МЕНЯТЬ!!! */
+    var re_str = /<p>(<i><b>(?<date>[0-9]{2}\/[0-9]{2}\/[0-9]{4})<\/b><\/i>)(?<unnecessary_1>.*\\n.*\\n\s*)(<i>Адрес:\s*<br>\\n\s*<b>(?<address>.*)<\/b><\/i><br>\\n\s*)(<i>Осн. часы:\\n*.*<b>(?<hours>[0-9]{1,2}\.[0-9]{1,2})<\/b>)(?<unnecessary_2>\s\([0-9]*\.\d{1,2}\).*\\n\s*)(<i>Доп. адрес:\s*.*\\n\s*<b>(?<added_address>.*)<\/b>.*\\n\s*)(<i>Доп. часы:\s*.*<b>(?<added_hours>[0-9]{1,2}\.[0-9]{1,2})<\/b>\s\(\d*\.\d{1,2}\s\+\s(?<change_location>[0-9]*\.[0-9]{1,2})\s.*\\n\s*)(<i>Бонус:\s*(?<bonus>[0-9]*)<\/i>.*\\n\s*)(<i>Штраф:\s*(?<fine>[0-9]*).*\\n\s*)(<i>Итог дня:\s*(?<money_one_day>[0-9]*\.[0-9]{1,2})<\/i>)<\/p>/
+    var regexp = new RegExp(re_str, "mu"); 
+    var groups_regexp; 
+    for(var i=1; i<marked.length; ++i) 
+      {/*for*/
+      if (marked[i].checked) 
+        {/*if*/
+          groups_regexp = String(marked_days[i].outerHTML).match(regexp).groups; 
+          result += `${groups_regexp.date}\t\t${groups_regexp.money_one_day} руб.\n`; 
+          all_money += Number(groups_regexp.money_one_day); 
+          result += `\t${groups_regexp.address}\t\t${groups_regexp.hours} час.\n`; 
+          if ( groups_regexp.added_address !== 'Нет') {
+            result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n`; } 
+        }/*if*/
+      }/*for*/
+    result += `________________________\n\n`; 
+    result += `Итого:\t\t${String(all_money)} руб.\n`; 
+    alert(result.slice(9)); /* Срез строки */
+  }/*func_2*/
+}/*func_1*/
+</script>''')
+
 print('</body></html>')
