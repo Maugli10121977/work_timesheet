@@ -308,11 +308,11 @@ window.onload = function()
       if (marked[i].checked) 
         {/*if*/
           groups_regexp = String(marked_days[i].outerHTML).match(regexp).groups; 
-          result += `${groups_regexp.date}\t\t${groups_regexp.money_one_day} руб.\n`; 
+          result += `${groups_regexp.date}\t\t${Number(groups_regexp.hours) * Number(312.5)} (за день) + ${Number(groups_regexp.added_hours) * Number(312.5)} (перераб.) + ${groups_regexp.bonus} (бонус) + ${groups_regexp.change_location} (см. лок.) - ${groups_regexp.fine} (штраф) = ${groups_regexp.money_one_day}\n`; 
           all_money += Number(groups_regexp.money_one_day); 
           result += `\t${groups_regexp.address}\t\t${groups_regexp.hours} час.\n`; 
           if ( groups_regexp.added_address !== 'Нет') {
-            result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n`; } 
+            result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n\n`; } 
         }/*if*/
       }/*for*/
     result += `________________________\n\n`; 
