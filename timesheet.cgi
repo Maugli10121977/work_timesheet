@@ -312,7 +312,7 @@ window.onload = function()
           all_money += Number(groups_regexp.money_one_day); 
           result += `\t${groups_regexp.address}\t\t${groups_regexp.hours} час.\n`; 
           if ( groups_regexp.added_address !== 'Нет') {
-            result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n\n`; } 
+            result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n`; } 
         }/*if*/
       }/*for*/
     result += `________________________\n\n`; 
