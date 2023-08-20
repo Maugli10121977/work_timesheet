@@ -16,8 +16,6 @@ today = datetime.now().strftime("%d/%m/%Y %H:%M")
 year = []
 for i in range(1,13):
     year.append(calendar.monthcalendar(int(y), i)) # запись в 'year' всех дат года
-tariff_one_day = 2500 # тариф в день
-tariff = tariff_one_day / 8 # тариф в час
 
 print('Content-type: text/html')
 print('')
@@ -181,6 +179,11 @@ for a in range(1, len(year)+1):
                 # сюда данные из БД
                 for z in timesheet_table_dict.keys():
                     if f'{y}-{date_m}-{date_d}' == z:
+                        if z < '2023-08-14':
+                            tariff_one_day = 2500
+                        else:
+                            tariff_one_day = 2700
+                        tariff = tariff_one_day / 8
                         timesheet_table_dict__boss = str(timesheet_table_dict[z][0])
                         timesheet_table_dict__address = str(timesheet_table_dict[z][1])
                         timesheet_table_dict__added_address = str(timesheet_table_dict[z][2])
@@ -266,8 +269,6 @@ for i in salary_table:
     if i[2] != 'None':
         sum_amount_money = sum_amount_money + int(i[2])
 
-#print('<input style="position:fixed; background-color:silver;" type="submit" id="get_marked_days" value="Показать помеченные дни">')
-
 print('<hr size="2">')
 print(f'<details><summary><i><b>ИТОГО (за весь {y} год):</b></i></summary>') # ИТОГИ ГОДА
 print('<p>-----------------------------')
@@ -295,28 +296,42 @@ window.onload = function()
 {/*func_1*/
   get_marked_days.onclick = function()
   {/*func_2*/
-    var all_money = Number(); 
-    var result; 
-    var marked = document.getElementsByName("marked"); 
-    var marked_days = document.getElementsByName("marked_days"); 
+    var date_change_salary = new Date("2023-08-14");
+    var tariff_one_day = Number();
+    var tariff = Number();
+    var all_money = Number();
+    var result;
+    var marked = document.getElementsByName("marked");
+    var marked_days = document.getElementsByName("marked_days");
     /* 're_str' НЕ МЕНЯТЬ!!! */
     var re_str = /<p>(<i><b>(?<date>[0-9]{2}\/[0-9]{2}\/[0-9]{4})<\/b><\/i>)(?<unnecessary_1>.*\\n.*\\n\s*)(<i>Адрес:\s*<br>\\n\s*<b>(?<address>.*)<\/b><\/i><br>\\n\s*)(<i>Осн. часы:\\n*.*<b>(?<hours>[0-9]{1,2}\.[0-9]{1,2})<\/b>)(?<unnecessary_2>\s\([0-9]*\.\d{1,2}\).*\\n\s*)(<i>Доп. адрес:\s*.*\\n\s*<b>(?<added_address>.*)<\/b>.*\\n\s*)(<i>Доп. часы:\s*.*<b>(?<added_hours>[0-9]{1,2}\.[0-9]{1,2})<\/b>\s\(\d*\.\d{1,2}\s\+\s(?<change_location>[0-9]*\.[0-9]{1,2})\s.*\\n\s*)(<i>Бонус:\s*(?<bonus>[0-9]*)<\/i>.*\\n\s*)(<i>Штраф:\s*(?<fine>[0-9]*).*\\n\s*)(<i>Итог дня:\s*(?<money_one_day>[0-9]*\.[0-9]{1,2})<\/i>)<\/p>/
-    var regexp = new RegExp(re_str, "mu"); 
-    var groups_regexp; 
+    var regexp = new RegExp(re_str, "mu");
+    var groups_regexp;
     for(var i=0; i<marked.length; ++i) 
       {/*for*/
       if (marked[i].checked) 
         {/*if*/
-          groups_regexp = String(marked_days[i].outerHTML).match(regexp).groups; 
-          result += `${groups_regexp.date}\t\t${Number(groups_regexp.hours) * Number(312.5)} (за день) + ${Number(groups_regexp.added_hours) * Number(312.5)} (перераб.) + ${groups_regexp.bonus} (бонус) + ${groups_regexp.change_location} (см. лок.) - ${groups_regexp.fine} (штраф) = ${groups_regexp.money_one_day}\n`; 
-          all_money += Number(groups_regexp.money_one_day); 
-          result += `\t${groups_regexp.address}\t\t${groups_regexp.hours} час.\n`; 
-          if ( groups_regexp.added_address !== 'Нет') {
-            result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n`; } 
+          groups_regexp = String(marked_days[i].outerHTML).match(regexp).groups;
+          let marked_date = new Date(`${groups_regexp.date.slice(6)}-${groups_regexp.date.slice(3,5)}-${groups_regexp.date.slice(0,2)}`);
+          if (marked_date < date_change_salary) 
+            {/*if*/
+              tariff_one_day = Number(2500);
+            }/*if*/
+          if (marked_date >= date_change_salary) 
+            {/*if*/
+              tariff_one_day = Number(2700);
+            }/*if*/
+          tariff = tariff_one_day / Number(8);
+          console.log(`${marked_date.getFullYear()}-${marked_date.getMonth()+1}-${marked_date.getDate()}`, tariff);
+          result += `${groups_regexp.date}\t\t${Number(groups_regexp.hours) * tariff} (за день) + ${Number(groups_regexp.added_hours) * tariff} (перераб.) + ${groups_regexp.bonus} (бонус) + ${groups_regexp.change_location} (см. лок.) - ${groups_regexp.fine} (штраф) = ${groups_regexp.money_one_day}\n`; 
+        all_money += Number(groups_regexp.money_one_day);
+        result += `\t${groups_regexp.address}\t\t${groups_regexp.hours} час. + ${groups_regexp.added_hours} час.\n`;
+        if (groups_regexp.added_address !== 'Нет') {
+          result += `\t${groups_regexp.added_address}\t\t${groups_regexp.added_hours} час.\n`; } 
         }/*if*/
       }/*for*/
-    result += `________________________\n\n`; 
-    result += `Итого:\t\t${String(all_money)} руб.\n`; 
+    result += `________________________\n\n`;
+    result += `Итого:\t\t${String(all_money)} руб.\n`;
     alert(result.slice(9)); /* Срез строки */
   }/*func_2*/
 }/*func_1*/
